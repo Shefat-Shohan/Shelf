@@ -1,5 +1,5 @@
 "use client";
-import { CreteListModal } from "./CreateListModal";
+import { CreateListModal } from "./CreateListModal";
 import { ModeToggle } from "./ModeToggle";
 import { ComboSearchbox } from "./ComboSearchBox";
 import { useBookContext } from "../context/BookContext";
@@ -17,7 +17,6 @@ export default function AddBooks() {
   const [searchItem, setSearchItem] = useState<Booklist[]>([]);
   const { user } = useUser();
   const { bookListData } = useBookContext();
-  const { getBookList } = useBookContext();
 
   useEffect(() => {
     user && serachByGenre();
@@ -59,7 +58,7 @@ export default function AddBooks() {
         </div>
         <div className="flex items-center justify-between md:gap-4">
           <ComboSearchbox />
-          <CreteListModal />
+          <CreateListModal />
           <div className="hidden md:block">
             <ModeToggle />
           </div>

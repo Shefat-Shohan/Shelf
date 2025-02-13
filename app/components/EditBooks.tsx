@@ -29,39 +29,46 @@ import { db } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import { useBookContext } from "../context/BookContext";
 import { bookTypes } from "@/data/types";
+import { useForm } from "react-hook-form";
 
 export type EditBooksProps = {
   book: bookTypes;
 };
 
 export default function EditBooks({ book }: any) {
-  console.log(book);
-  const [selectedGenre, setSelectedGenre] = useState<string>(
-    book.bookGenre || ""
-  );
-  const [selectedBookStatus, setSelectedBookStatus] = useState<string>(
-    book.bookGenre || ""
-  );
-  const [bookName, setBookName] = useState<string>(book.bookName || "");
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      bookName: book.bookName || "",
+      bookGenre: book.bookGenre || "",
+      bookStatus: book.bookStatus || "",
+    },
+  });
+
   const [open, setOpen] = useState<boolean>(false);
   const [isDisable, setIsDisable] = useState(false);
   const { user } = useUser();
   const { getBookList } = useBookContext();
-  // edit booklist function
-  const handleEditBook = async (bookId: number) => {
+
+  // Edit book function
+  const handleEditBook = async (data: any) => {
     try {
       setIsDisable(true);
       await db
         .update(bookList)
         .set({
-          bookName: bookName,
-          bookGenre: selectedGenre,
-          bookStatus: selectedBookStatus,
+          bookName: data.bookName,
+          bookGenre: data.bookGenre,
+          bookStatus: data.bookStatus,
         })
         .where(
           and(
-            eq(bookList.id, bookId),
-            // @ts-ignore
+            eq(bookList.id, book.id),
+            //@ts-ignore
             eq(bookList.createBy, user?.primaryEmailAddress?.emailAddress)
           )
         );
@@ -73,6 +80,7 @@ export default function EditBooks({ book }: any) {
     }
     setOpen(false);
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -85,28 +93,29 @@ export default function EditBooks({ book }: any) {
           <DialogTitle>Edit Book</DialogTitle>
           <DialogDescription>Edit your book details</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form
+          onSubmit={handleSubmit(handleEditBook)}
+          className="grid gap-4 py-4"
+        >
           {/* Book Name Input */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+            <Label htmlFor="bookName" className="text-right">
               Book Name
             </Label>
             <Input
-              id="name"
+              id="bookName"
               className="col-span-3"
-              defaultValue={book.bookName}
-              value={bookName}
-              onChange={(e) => setBookName(e.target.value)}
+              {...register("bookName", { required: "Book name is required" })}
             />
           </div>
 
           {/* Book Genre Select */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="genre" className="text-right">
+            <Label htmlFor="bookGenre" className="text-right">
               Book Genre
             </Label>
             <Select
-              onValueChange={setSelectedGenre}
+              {...register("bookGenre", { required: "Book genre is required" })}
               defaultValue={book.bookGenre}
             >
               <SelectTrigger className="w-[180px]">
@@ -123,13 +132,16 @@ export default function EditBooks({ book }: any) {
               </SelectContent>
             </Select>
           </div>
-          {/* select bookStatus */}
+
+          {/* Book Status Select */}
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="genre" className="text-right">
+            <Label htmlFor="bookStatus" className="text-right">
               Book Status
             </Label>
             <Select
-              onValueChange={setSelectedBookStatus}
+              {...register("bookStatus", {
+                required: "Book status is required",
+              })}
               defaultValue={book.bookStatus}
             >
               <SelectTrigger className="w-[180px]">
@@ -146,12 +158,12 @@ export default function EditBooks({ book }: any) {
               </SelectContent>
             </Select>
           </div>
-        </div>
-        <DialogFooter>
-          <Button onClick={() => handleEditBook(book.id)} disabled={isDisable}>
-            Update Book
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button type="submit" disabled={isDisable}>
+              Update Book
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

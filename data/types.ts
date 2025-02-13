@@ -28,3 +28,10 @@ export type genreType = {
   value: string;
   label: string;
 };
+
+export type suggestBookType = {
+  volumeInfo: {
+    title: string;
+    authors: string;
+  };
+};

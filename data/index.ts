@@ -72,4 +72,5 @@ export const bookStatus = [
   },
 ];
 
-export const prompts = "Please generate a summary for the this book:";
+export const prompts =
+  "Please generate a concise and insightful summary for the book titled";
