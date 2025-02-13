@@ -48,7 +48,7 @@ export default function EditBooks({ book }: any) {
       bookStatus: book.bookStatus || "",
     },
   });
-
+console.log(book.id);
   const [open, setOpen] = useState<boolean>(false);
   const [isDisable, setIsDisable] = useState(false);
   const { user } = useUser();
@@ -105,6 +105,7 @@ export default function EditBooks({ book }: any) {
             <Input
               id="bookName"
               className="col-span-3"
+              defaultValue={book.bookName}
               {...register("bookName", { required: "Book name is required" })}
             />
           </div>
@@ -115,7 +116,7 @@ export default function EditBooks({ book }: any) {
               Book Genre
             </Label>
             <Select
-              {...register("bookGenre", { required: "Book genre is required" })}
+              onValueChange={(value) => setValue("bookGenre", value)}
               defaultValue={book.bookGenre}
             >
               <SelectTrigger className="w-[180px]">
@@ -139,9 +140,7 @@ export default function EditBooks({ book }: any) {
               Book Status
             </Label>
             <Select
-              {...register("bookStatus", {
-                required: "Book status is required",
-              })}
+              onValueChange={(value) => setValue("bookStatus", value)} 
               defaultValue={book.bookStatus}
             >
               <SelectTrigger className="w-[180px]">
